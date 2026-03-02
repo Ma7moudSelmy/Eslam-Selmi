@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إسلام سلمي | قائد التعلم والتطوير</title>
+<style>
+:root{
+  --bg:#04060f;
+  --accent:#00e5a0;
+  --accent2:#7c6fff;
+  --accent3:#ff6b9d;
+  --text:#f0f4ff;
+  --muted:#8892b0;
+  --card:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Cairo","Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* ─── CANVAS BG ─── */
+#bgCanvas{
+  position:fixed;inset:0;
+  z-index:0;pointer-events:none;
+}
+
+/* ─── CURSOR ─── */
+.cursor-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--accent);
+  position:fixed;
+  pointer-events:none;
+  z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:transform .1s;
+}
+.cursor-ring{
+  width:36px;height:36px;
+  border-radius:50%;
+  border:2px solid rgba(0,229,160,0.5);
+  position:fixed;
+  pointer-events:none;
+  z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:width .3s,height .3s,border-color .3s;
+}
+
+/* ─── NAV ─── */
+nav{
+  position:fixed;top:0;width:100%;
+  z-index:500;
+  padding:1rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .4s,backdrop-filter .4s;
+}
+nav.scrolled{
+  background:rgba(4,6,15,0.9);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{
+  font-size:1.3rem;font-weight:800;
+  background:linear-gradient(120deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;color:transparent;
+}
+.nav-links{display:flex;gap:1.6rem;list-style:none;}
+.nav-links a{
+  color:var(--muted);font-weight:600;font-size:.9rem;
+  transition:color .3s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;
+  height:2px;border-radius:9px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  transform:scaleX(0);transition:transform .3s;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-links a:hover::after,.nav-links a.active::after{transform:scaleX(1);}
+.nav-toggle{display:none;border:none;background:var(--card);border:1px solid var(--border);color:var(--text);padding:.5rem .8rem;border-radius:.8rem;cursor:pointer;font-size:1.3rem;}
+
+/* ─── HERO ─── */
+#home{
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:1;
+  padding:7rem 2rem 4rem;
+}
+.hero-inner{
+  max-width:1100px;width:100%;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:3rem;align-items:center;
+}
+.hero-text .greeting{
+  display:inline-flex;align-items:center;gap:.6rem;
+  background:rgba(0,229,160,0.1);
+  border:1px solid rgba(0,229,160,0.3);
+  border-radius:999px;padding:.4rem 1rem;
+  font-size:.85rem;font-weight:700;color:var(--accent);
+  margin-bottom:1.5rem;
+  animation:fadeDown .8s ease forwards;
+}
+.hero-text h1{
+  font-size:clamp(2rem,4vw,3.2rem);
+  line-height:1.25;
+  animation:fadeUp 1s .2s ease both;
+}
+.hero-text h1 .name{
+  background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));
+  -webkit-background-clip:text;color:transparent;
+  background-size:200%;
+  animation:gradShift 4s infinite linear;
+}
+@keyframes gradShift{
+  0%{background-position:0%}100%{background-position:200%}
+}
+.hero-text .title{
+  color:var(--muted);font-size:1.1rem;margin-top:.7rem;
+  animation:fadeUp 1s .4s ease both;
+}
+.hero-text .desc{
+  color:var(--muted);line-height:1.9;margin:1.5rem 0 2rem;
+  animation:fadeUp 1s .6s ease both;
+}
+.hero-btns{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  animation:fadeUp 1s .8s ease both;
+}
+.btn{
+  padding:.85rem 1.8rem;border-radius:999px;
+  font-weight:700;font-family:inherit;font-size:.95rem;
+  cursor:pointer;border:none;
+  transition:transform .25s,box-shadow .25s;
+  position:relative;overflow:hidden;
+}
+.btn::after{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,0.15);
+  opacity:0;transition:opacity .25s;
+}
+.btn:hover::after{opacity:1;}
+.btn:hover{transform:translateY(-4px);}
+.btn-primary{
+  background:linear-gradient(120deg,var(--accent),var(--accent2));
+  color:#04060f;
+  box-shadow:0 16px 30px rgba(0,229,160,0.25);
+}
+.btn-glass{
+  background:var(--card);
+  border:1px solid var(--border);
+  color:var(--text);
+}
+
+/* HERO CARD */
+.hero-card-wrap{animation:fadeLeft 1s .3s ease both;}
+.glass-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:1.8rem;
+  padding:2rem;
+  backdrop-filter:blur(12px);
+  box-shadow:0 30px 80px rgba(0,0,0,0.4);
+  position:relative;overflow:hidden;
+}
+.glass-card::before{
+  content:'';position:absolute;
+  top:-40%;right:-30%;
+  width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,111,255,0.25),transparent 70%);
+  pointer-events:none;
+}
+.stats-row{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1rem;margin-bottom:1.8rem;
+}
+.scard{
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);
+  border-radius:1.2rem;padding:1.2rem;
+  text-align:center;
+}
+.scard strong{
+  display:block;font-size:1.9rem;font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;color:transparent;
+}
+.scard span{color:var(--muted);font-size:.8rem;}
+.skill-bars{display:grid;gap:.9rem;}
+.skill-bar-wrap{}
+.skill-bar-wrap .label{
+  display:flex;justify-content:space-between;
+  font-size:.85rem;font-weight:700;margin-bottom:.45rem;
+}
+.bar-track{
+  height:6px;background:rgba(255,255,255,0.08);
+  border-radius:999px;overflow:hidden;
+}
+.bar-fill{
+  height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  width:0;transition:width 1.5s ease;
+}
+
+/* ─── SECTIONS ─── */
+section{position:relative;z-index:1;padding:5rem 2rem;}
+.wrap{max-width:1100px;margin:auto;}
+.sec-title{
+  display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;
+}
+.sec-title .line{
+  flex:1;height:2px;
+  background:linear-gradient(90deg,var(--accent),transparent);
+}
+.sec-title h2{
+  font-size:1.9rem;font-weight:900;white-space:nowrap;
+  background:linear-gradient(120deg,var(--text),var(--muted));
+  -webkit-background-clip:text;color:transparent;
+}
+
+/* REVEAL */
+.reveal{
+  opacity:0;transform:translateY(40px);
+  transition:opacity .7s ease,transform .7s ease;
+}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ─── ABOUT ─── */
+.about-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:2rem;
+}
+.about-text p{
+  color:var(--muted);line-height:1.95;margin-bottom:1rem;
+}
+.focus-cards{display:grid;gap:1rem;}
+.focus-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:1.2rem;padding:1.2rem 1.4rem;
+  transition:border-color .3s,transform .3s;
+  cursor:default;
+}
+.focus-card:hover{
+  border-color:rgba(0,229,160,0.4);
+  transform:translateX(-6px);
+}
+.focus-card .fc-tag{
+  font-size:.8rem;font-weight:800;letter-spacing:.1em;
+  color:var(--accent);margin-bottom:.4rem;
+}
+.focus-card p{color:var(--muted);font-size:.92rem;margin:0;}
+
+/* ─── TIMELINE ─── */
+.timeline{display:grid;gap:1.5rem;position:relative;padding-right:2rem;}
+.timeline::before{
+  content:'';position:absolute;
+  right:.5rem;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--accent),var(--accent2),transparent);
+}
+.t-item{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:1.4rem;padding:1.6rem 1.6rem 1.6rem 1.6rem;
+  position:relative;
+  transition:border-color .3s,transform .3s,box-shadow .3s;
+}
+.t-item::before{
+  content:'';position:absolute;
+  top:1.7rem;right:-2.75rem;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--bg);border:3px solid var(--accent);
+  box-shadow:0 0 12px var(--accent);
+}
+.t-item:hover{
+  border-color:rgba(0,229,160,0.35);
+  transform:translateX(-6px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.35);
+}
+.t-item h3{font-size:1.1rem;font-weight:800;}
+.t-item .meta{color:var(--accent);font-size:.85rem;font-weight:700;margin:.3rem 0 .8rem;}
+.t-item ul{padding-right:1.2rem;color:var(--muted);display:grid;gap:.4rem;line-height:1.8;}
+
+/* ─── CREDS ─── */
+.creds-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:1.1rem;
+}
+.cred{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:1.2rem;padding:1.3rem;
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+  cursor:default;
+}
+.cred:hover{
+  transform:translateY(-6px);
+  box-shadow:0 20px 40px rgba(124,111,255,0.2);
+  border-color:rgba(124,111,255,0.4);
+}
+.cred strong{display:block;font-size:1rem;margin-bottom:.3rem;}
+.cred span{color:var(--muted);font-size:.83rem;}
+
+/* ─── SERVICES ─── */
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:1.3rem;
+}
+.srv{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:1.4rem;padding:1.7rem;
+  transition:transform .3s,box-shadow .3s;
+  cursor:default;overflow:hidden;position:relative;
+}
+.srv::after{
+  content:'';position:absolute;
+  bottom:-40px;left:-40px;
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,157,0.2),transparent 70%);
+  pointer-events:none;
+  transition:transform .4s;
+}
+.srv:hover{transform:translateY(-8px);box-shadow:0 30px 60px rgba(0,0,0,0.4);}
+.srv:hover::after{transform:scale(2);}
+.srv-icon{font-size:2rem;margin-bottom:.9rem;}
+.srv h3{font-size:1.05rem;font-weight:800;margin-bottom:.6rem;}
+.srv p{color:var(--muted);font-size:.9rem;line-height:1.8;}
+
+/* ─── PROGRAMS ─── */
+.programs-list{display:grid;gap:1.4rem;}
+.prog{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:1.6rem;overflow:hidden;
+}
+.prog-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.5rem 1.8rem;cursor:pointer;
+  transition:background .3s;
+  gap:1rem;
+}
+.prog-head:hover{background:rgba(255,255,255,0.05);}
+.prog-head h3{font-size:1.15rem;font-weight:800;}
+.prog-head .badge{
+  padding:.3rem .9rem;border-radius:999px;
+  background:rgba(0,229,160,0.12);
+  border:1px solid rgba(0,229,160,0.3);
+  color:var(--accent);font-size:.8rem;font-weight:700;
+  white-space:nowrap;
+}
+.prog-icon{
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;background:rgba(255,255,255,0.06);
+  font-size:1rem;transition:transform .4s;flex-shrink:0;
+}
+.prog.open .prog-icon{transform:rotate(45deg);}
+.prog-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .5s cubic-bezier(0.4,0,0.2,1);
+}
+.prog-body-inner{
+  padding:0 1.8rem 1.8rem;
+  border-top:1px solid var(--border);
+  padding-top:1.2rem;
+}
+.prog-body-inner p{color:var(--muted);line-height:1.8;margin-bottom:1rem;}
+.prog-body-inner ul{
+  padding-right:1.2rem;color:var(--muted);
+  display:grid;gap:.45rem;line-height:1.8;
+}
+
+/* ─── STATS ─── */
+#impact{
+  background:linear-gradient(135deg,rgba(0,229,160,0.06),rgba(124,111,255,0.06));
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.stats-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:1.2rem;
+}
+.stat-box{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:1.4rem;padding:1.8rem;
+  text-align:center;
+  transition:transform .3s,box-shadow .3s;
+}
+.stat-box:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(0,0,0,.4);}
+.stat-num{
+  font-size:2.5rem;font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;color:transparent;
+  display:block;
+}
+.stat-box span{color:var(--muted);font-size:.9rem;}
+
+/* ─── CLIENTS ─── */
+.clients-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:1rem;
+}
+.client{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:1.2rem;padding:1.2rem;
+  font-size:.9rem;color:var(--muted);line-height:1.7;
+  transition:border-color .3s,transform .3s;
+}
+.client:hover{border-color:rgba(0,229,160,0.35);transform:translateY(-4px);}
+.client strong{display:block;color:var(--text);margin-bottom:.3rem;}
+
+/* ─── GLOBAL ─── */
+.global-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:1rem;
+}
+.country{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:1.1rem;padding:1.1rem;
+  transition:transform .3s,border-color .3s;cursor:default;
+}
+.country:hover{transform:scale(1.05);border-color:rgba(124,111,255,0.4);}
+.country span{display:block;font-size:1.3rem;margin-bottom:.3rem;}
+.country p{color:var(--muted);font-size:.82rem;margin:0;}
+
+/* ─── CONTACT ─── */
+.contact-wrap{
+  background:linear-gradient(145deg,rgba(0,229,160,0.12),rgba(124,111,255,0.1));
+  border:1px solid var(--border);border-radius:2rem;
+  padding:3rem;position:relative;overflow:hidden;
+}
+.contact-wrap::before{
+  content:'';position:absolute;
+  top:-50%;right:-20%;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,111,255,0.2),transparent 70%);
+  pointer-events:none;
+}
+.contact-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:1.2rem;margin-top:2rem;position:relative;
+}
+.contact-card{
+  background:rgba(4,6,15,0.7);border:1px solid var(--border);
+  border-radius:1.3rem;padding:1.5rem;
+  backdrop-filter:blur(10px);
+  transition:transform .3s,border-color .3s;
+}
+.contact-card:hover{transform:translateY(-5px);border-color:rgba(0,229,160,0.35);}
+.contact-card .cc-label{
+  font-size:.78rem;font-weight:800;letter-spacing:.1em;
+  color:var(--accent);margin-bottom:.5rem;
+}
+.contact-card strong{display:block;font-size:.95rem;margin-bottom:.2rem;}
+.contact-card p{color:var(--muted);font-size:.88rem;margin:0;}
+
+/* ─── FOOTER ─── */
+footer{
+  text-align:center;padding:2.5rem;
+  color:var(--muted);font-size:.9rem;
+  border-top:1px solid var(--border);
+  position:relative;z-index:1;
+}
+
+/* ─── SCROLL BTN ─── */
+#scrollTop{
+  position:fixed;bottom:1.5rem;left:1.5rem;
+  width:48px;height:48px;border-radius:50%;
+  border:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#04060f;font-size:1.2rem;
+  cursor:pointer;z-index:400;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(20px);
+  transition:opacity .3s,transform .3s;
+  box-shadow:0 10px 30px rgba(0,229,160,0.3);
+}
+#scrollTop.show{opacity:1;transform:translateY(0);}
+
+/* ─── KEYFRAMES ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeLeft{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .hero-inner,.about-grid{grid-template-columns:1fr;}
+  .hero-card-wrap{order:-1;}
+}
+@media(max-width:680px){
+  .nav-links{
+    position:absolute;top:100%;right:1rem;left:1rem;
+    flex-direction:column;
+    background:rgba(4,6,15,0.97);
+    border:1px solid var(--border);border-radius:1.3rem;
+    padding:1.2rem;gap:.8rem;
+    transform:scaleY(0);transform-origin:top;opacity:0;
+    transition:transform .25s,opacity .25s;
+  }
+  .nav-links.open{transform:scaleY(1);opacity:1;}
+  .nav-toggle{display:flex;}
+  .stats-row{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:420px){
+  .stats-row{grid-template-columns:1fr;}
+  .hero-btns .btn{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-brand">إسلام سلمي</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home" class="active">الرئيسية</a></li>
+    <li><a href="#about">من أنا</a></li>
+    <li><a href="#journey">المسار</a></li>
+    <li><a href="#services">الخدمات</a></li>
+    <li><a href="#programs">البرامج</a></li>
+    <li><a href="#impact">الأثر</a></li>
+    <li><a href="#clients">العملاء</a></li>
+    <li><a href="#contact">تواصل</a></li>
+  </ul>
+  <button class="nav-toggle" id="navToggle">☰</button>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-inner wrap">
+    <div class="hero-text">
+      <div class="greeting">👋 مرحباً</div>
+      <h1>أنا <span class="name">إسلام سلمي</span></h1>
+      <p class="title">قائد التعلم والتطوير | مصمم تجارب تعليمية | خبير إدارة المواهب</p>
+      <p class="desc">أبني منظومات تعلم متكاملة تُلهم الموظفين وتحوّل الأهداف إلى نتائج ملموسة. أكثر من ٨ سنوات من الخبرة عبر قطاعات التجزئة، اللوجستيات، والخدمات الأمنية.</p>
+      <div class="hero-btns">
+        <a class="btn btn-primary" href="#programs">استكشف البرامج</a>
+        <a class="btn btn-glass" href="#contact">احجز استشارة</a>
+      </div>
+    </div>
+    <div class="hero-card-wrap">
+      <div class="glass-card">
+        <div class="stats-row">
+          <div class="scard"><strong id="countYears">0</strong><span>سنوات خبرة</span></div>
+          <div class="scard"><strong id="countTrainees">0</strong><span>متدرب</span></div>
+          <div class="scard"><strong id="countCountries">0</strong><span>دولة</span></div>
+        </div>
+        <div class="skill-bars">
+          <div class="skill-bar-wrap"><div class="label"><span>التصميم التعليمي</span><span>95%</span></div><div class="bar-track"><div class="bar-fill" data-w="95"></div></div></div>
+          <div class="skill-bar-wrap"><div class="label"><span>استراتيجية التعلم</span><span>92%</span></div><div class="bar-track"><div class="bar-fill" data-w="92"></div></div></div>
+          <div class="skill-bar-wrap"><div class="label"><span>إدارة المواهب</span><span>90%</span></div><div class="bar-track"><div class="bar-fill" data-w="90"></div></div></div>
+          <div class="skill-bar-wrap"><div class="label"><span>قياس الأثر ROI</span><span>88%</span></div><div class="bar-track"><div class="bar-fill" data-w="88"></div></div></div>
+          <div class="skill-bar-wrap"><div class="label"><span>التدريب القيادي</span><span>93%</span></div><div class="bar-track"><div class="bar-fill" data-w="93"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <div class="line"></div>
+      <h2>من أنا</h2>
+      <div class="line" style="background:linear-gradient(270deg,var(--accent2),transparent)"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>أقود عمليات التعلم والتطوير في قطاعات متنوعة وطوّرت برامج تدريبية مؤثرة في شركات كـ IMTENAN، Badreldin، Aramex، G4S، ودار النخبة. أحوّل الرؤية إلى خطط تدريب تنفيذية، وأبني مسارات تطوير سلوكي ومهاري تُترجم إلى أداء حقيقي.</p>
+        <p>أؤمن بأن التعلم ليس حدثاً بل رحلة مستمرة، وأسعى دائماً لبناء ثقافات تعلم نابضة بالحياة داخل المؤسسات التي أعمل معها.</p>
+      </div>
+      <div class="focus-cards reveal" style="transition-delay:.15s">
+        <div class="focus-card"><div class="fc-tag">أسلوبي القيادي</div><p>شامل، يعتمد على البيانات، ويرتكز على الإنسان لتمكين الفرق من تقديم أفضل ما لديها.</p></div>
+        <div class="focus-card"><div class="fc-tag">مجالات التخصص</div><p>إدارة المواهب · التصميم التعليمي · قياس العائد على التدريب · التدريب الهجين.</p></div>
+        <div class="focus-card"><div class="fc-tag">قيم العمل</div><p>الشراكة، التحسين المستمر، والالتزام بتجربة متعلم ممتعة وفعّالة.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section id="journey">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <div class="line"></div>
+      <h2>المسار المهني</h2>
+      <div class="line" style="background:linear-gradient(270deg,var(--accent2),transparent)"></div>
+    </div>
+    <div class="timeline">
+      <div class="t-item reveal">
+        <h3>رئيس التعلم والتطوير — المملكة العربية السعودية</h3>
+        <div class="meta">📍 ٢٠٢٥ · الحاضر</div>
+        <ul>
+          <li>بناء أطر كفاءات متكاملة وربطها بمؤشرات أداء الأعمال</li>
+          <li>إطلاق أكاديمية تعلم رقمية تدعم الفروع الميدانية</li>
+        </ul>
+      </div>
+      <div class="t-item reveal" style="transition-delay:.1s">
+        <h3>رئيس التعلم والتطوير — IMTENAN</h3>
+        <div class="meta">📍 ٢٠٢٤ · مصر</div>
+        <ul>
+          <li>تصميم مسارات تدريبية للفروع محققة زيادة في الإنتاجية</li>
+          <li>إدارة ميزانية التدريب السنوية مع قياس العائد على الاستثمار</li>
+        </ul>
+      </div>
+      <div class="t-item reveal" style="transition-delay:.2s">
+        <h3>مشرف تعلم وتطوير — Badreldin Developments</h3>
+        <div class="meta">📍 ٢٠٢٣ · مصر</div>
+        <ul>
+          <li>تطوير برامج تأهيل متميزة للموظفين الجدد</li>
+          <li>إدماج أدوات تحليل البيانات في متابعة نتائج التدريب</li>
+        </ul>
+      </div>
+      <div class="t-item reveal" style="transition-delay:.3s">
+        <h3>مشرف مراقبة عمليات — قطاع اللوجستيات</h3>
+        <div class="meta">📍 ٢٠٢٢ · مصر</div>
+        <ul>
+          <li>ربط معايير الجودة ببرامج التدريب التشغيلي</li>
+          <li>تطوير خطط تحسين أداء تعتمد على التدريب الموجه</li>
+        </ul>
+      </div>
+      <div class="t-item reveal" style="transition-delay:.4s">
+        <h3>أخصائي أول تعلم وتطوير — G4S</h3>
+        <div class="meta">📍 ٢٠١٧ · مصر</div>
+        <ul>
+          <li>إنشاء مسارات تدريب أمنية متخصصة</li>
+          <li>إطلاق برامج تدريب المدربين لفرق العمليات</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CREDENTIALS -->
+<section id="credentials">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <div class="line"></div>
+      <h2>الشهادات والاعتمادات</h2>
+      <div class="line" style="background:linear-gradient(270deg,var(--accent2),transparent)"></div>
+    </div>
+    <div class="creds-grid">
+      <div class="cred reveal"><strong>ثقافة العمل</strong><span>برنامج مهارات</span></div>
+      <div class="cred reveal" style="transition-delay:.07s"><strong>Design Thinking</strong><span>HP Life</span></div>
+      <div class="cred reveal" style="transition-delay:.14s"><strong>IDeLX</strong><span>التميز في التصميم التعليمي</span></div>
+      <div class="cred reveal" style="transition-delay:.21s"><strong>IDPCC</strong><span>مدرب تصميم تعليمي محترف</span></div>
+      <div class="cred reveal" style="transition-delay:.28s"><strong>إدارة الموارد البشرية</strong><span>Great Learning</span></div>
+      <div class="cred reveal" style="transition-delay:.35s"><strong>Leaders of Learning</strong><span>HarvardX</span></div>
+      <div class="cred reveal" style="transition-delay:.42s"><strong>L&D Professional</strong><span>المهارات المتقدمة</span></div>
+      <div class="cred reveal" style="transition-delay:.49s"><strong>PMP®</strong><span>قيد الإنجاز</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <div class="line"></div>
+      <h2>الخدمات الرئيسية</h2>
+      <div class="line" style="background:linear-gradient(270deg,var(--accent2),transparent)"></div>
+    </div>
+    <div class="services-grid">
+      <div class="srv reveal"><div class="srv-icon">🎯</div><h3>استشارات استراتيجية التعلم</h3><p>صياغة خطط تطوير متكاملة تربط أهداف الأعمال بنمو المواهب وتضمن عائداً ملموساً.</p></div>
+      <div class="srv reveal" style="transition-delay:.1s"><div class="srv-icon">🖥️</div><h3>التدريب المؤسسي الهجين</h3><p>جلسات تفاعلية حضورية وافتراضية مُفصّلة وفق احتياج كل مؤسسة وفريق.</p></div>
+      <div class="srv reveal" style="transition-delay:.2s"><div class="srv-icon">✏️</div><h3>حلول التصميم التعليمي</h3><p>بناء حقائب تعليمية جذابة تعتمد على القصص والتجارب العملية لضمان التفاعل والاحتفاظ.</p></div>
+      <div class="srv reveal" style="transition-delay:.3s"><div class="srv-icon">🤝</div><h3>التدريب الفردي والكوتشينج</h3><p>جلسات Coaching شخصية لاكتشاف الإمكانات وتعزيز مهارات القيادة والتأثير.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMS -->
+<section id="programs">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <div class="line"></div>
+      <h2>البرامج التدريبية</h2>
+      <div class="line" style="background:linear-gradient(270deg,var(--accent2),transparent)"></div>
+    </div>
+    <div class="programs-list">
+      <div class="prog reveal">
+        <div class="prog-head" onclick="toggleProg(this)">
+          <h3>إدارة المواهب</h3>
+          <span class="badge">برنامج شامل</span>
+          <div class="prog-icon">+</div>
+        </div>
+        <div class="prog-body">
+          <div class="prog-body-inner">
+            <p>تجربة تدريبية تغطي الاستقطاب، تخطيط المسارات، وتطوير القادة من خلال جلسات تطبيقية.</p>
+            <ul>
+              <li>التصميم التعليمي: بناء تجارب تعلم مؤثرة</li>
+              <li>إتقان التوظيف: أدوات واستراتيجيات لجذب أفضل المرشحين</li>
+              <li>تدريب المدربين TOT: تمكين المدربين من تقديم جلسات ملهمة</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="prog reveal" style="transition-delay:.1s">
+        <div class="prog-head" onclick="toggleProg(this)">
+          <h3>إطلاق إدارة التعلم من الصفر</h3>
+          <span class="badge">من التحليل إلى الأثر</span>
+          <div class="prog-icon">+</div>
+        </div>
+        <div class="prog-body">
+          <div class="prog-body-inner">
+            <p>يساعد المؤسسات على تأسيس إدارة تعلم متكاملة بعناصرها كافة.</p>
+            <ul>
+              <li>تحليل الاحتياج التدريبي واكتشاف فجوات المهارات</li>
+              <li>تصميم خطة تدريب سنوية وإدارة الموارد والميزانيات</li>
+              <li>قياس الأثر وتحليل العائد على الاستثمار</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="prog reveal" style="transition-delay:.2s">
+        <div class="prog-head" onclick="toggleProg(this)">
+          <h3>مهارات قيادية وشخصية</h3>
+          <span class="badge">ورش تفاعلية</span>
+          <div class="prog-icon">+</div>
+        </div>
+        <div class="prog-body">
+          <div class="prog-body-inner">
+            <p>ورش عملية تنمّي مهارات التواصل، القيادة، حل المشكلات، والتفاوض.</p>
+            <ul>
+              <li>التواصل الفعّال · القيادة الملهمة · التفكير التحليلي</li>
+              <li>التفاوض الإبداعي · بناء الفرق · إدارة الوقت</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="prog reveal" style="transition-delay:.3s">
+        <div class="prog-head" onclick="toggleProg(this)">
+          <h3>المجال الأمني</h3>
+          <span class="badge">جاهزية عملياتية</span>
+          <div class="prog-icon">+</div>
+        </div>
+        <div class="prog-body">
+          <div class="prog-body-inner">
+            <p>منظومة تدريب متخصصة لحماية الأصول وضمان سلامة المنشآت.</p>
+            <ul>
+              <li>SBTC — التدريب الأمني الأساسي</li>
+              <li>خطط الإخلاء والطوارئ</li>
+              <li>مهارات المراقبة والرصد الميداني</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section id="impact">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <div class="line"></div>
+      <h2>مؤشرات الأثر</h2>
+      <div class="line" style="background:linear-gradient(270deg,var(--accent2),transparent)"></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box reveal"><span class="stat-num" data-target="3000" data-suffix="+">0</span><span>متدرب منذ ٢٠١٧</span></div>
+      <div class="stat-box reveal" style="transition-delay:.1s"><span class="stat-num" data-target="15" data-suffix="+">0</span><span>موضوع تدريبي متنوع</span></div>
+      <div class="stat-box reveal" style="transition-delay:.2s"><span class="stat-num" data-target="12" data-suffix="+">0</span><span>شركة كبرى كعميل</span></div>
+      <div class="stat-box reveal" style="transition-delay:.3s"><span class="stat-num" data-target="97" data-suffix="٪">0</span><span>معدل رضا المتدربين</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section id="clients">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <div class="line"></div>
+      <h2>شركاء النجاح</h2>
+      <div class="line" style="background:linear-gradient(270deg,var(--accent2),transparent)"></div>
+    </div>
+    <div class="clients-grid">
+      <div class="client reveal"><strong>Aramex</strong>تطوير فرق الخدمات واللوجستيات</div>
+      <div class="client reveal" style="transition-delay:.06s"><strong>Amazon.eg</strong>تدريب فرق العمليات وخدمة العملاء</div>
+      <div class="client reveal" style="transition-delay:.12s"><strong>IMTENAN</strong>أكاديمية التجزئة وقياس الأداء</div>
+      <div class="client reveal" style="transition-delay:.18s"><strong>Badreldin</strong>بناء قدرات فرق المشاريع</div>
+      <div class="client reveal" style="transition-delay:.24s"><strong>G4S</strong>مسارات تدريب أمنية متكاملة</div>
+      <div class="client reveal" style="transition-delay:.30s"><strong>المنصة</strong>مبادرات تطوير القوى العاملة</div>
+      <div class="client reveal" style="transition-delay:.36s"><strong>دار النخبة</strong>تمكين الباحثين عن عمل</div>
+      <div class="client reveal" style="transition-delay:.42s"><strong>Mall of Egypt</strong>تجربة الزوار وخدمة العملاء</div>
+      <div class="client reveal" style="transition-delay:.48s"><strong>Aler Aquafina</strong>تدريب فرق المبيعات والتوزيع</div>
+      <div class="client reveal" style="transition-delay:.54s"><strong>EVNO</strong>مهارات المستقبل والعمل عن بُعد</div>
+    </div>
+  </div>
+</section>
+
+<!-- GLOBAL -->
+<section id="global">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <div class="line"></div>
+      <h2>حضور إقليمي</h2>
+      <div class="line" style="background:linear-gradient(270deg,var(--accent2),transparent)"></div>
+    </div>
+    <div class="global-grid">
+      <div class="country reveal"><span>🇪🇬</span><strong>مصر</strong><p>التجزئة</p></div>
+      <div class="country reveal" style="transition-delay:.06s"><span>🇸🇦</span><strong>السعودية</strong><p>الأكاديميات</p></div>
+      <div class="country reveal" style="transition-delay:.12s"><span>🇦🇪</span><strong>الإمارات</strong><p>القيادة</p></div>
+      <div class="country reveal" style="transition-delay:.18s"><span>🇶🇦</span><strong>قطر</strong><p>المواهب</p></div>
+      <div class="country reveal" style="transition-delay:.24s"><span>🇴🇲</span><strong>عُمان</strong><p>التحول المهاري</p></div>
+      <div class="country reveal" style="transition-delay:.30s"><span>🇧🇭</span><strong>البحرين</strong><p>التعلم الهجين</p></div>
+      <div class="country reveal" style="transition-delay:.36s"><span>🇯🇴</span><strong>الأردن</strong><p>إدارة الأداء</p></div>
+      <div class="country reveal" style="transition-delay:.42s"><span>🇱🇧</span><strong>لبنان</strong><p>مهارات التواصل</p></div>
+      <div class="country reveal" style="transition-delay:.48s"><span>🇲🇦</span><strong>المغرب</strong><p>تصميم التدريب</p></div>
+      <div class="country reveal" style="transition-delay:.54s"><span>🇹🇳</span><strong>تونس</strong><p>إعداد المدربين</p></div>
+      <div class="country reveal" style="transition-delay:.60s"><span>🇩🇿</span><strong>الجزائر</strong><p>برامج أمنية</p></div>
+      <div class="country reveal" style="transition-delay:.66s"><span>🇾🇪</span><strong>اليمن</strong><p>تدريب عن بعد</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <div class="line"></div>
+      <h2>تواصل معي</h2>
+      <div class="line" style="background:linear-gradient(270deg,var(--accent2),transparent)"></div>
+    </div>
+    <div class="contact-wrap reveal">
+      <h2 style="font-size:1.8rem;margin-bottom:.8rem">فلنصنع تجربة تعلم تحدث أثراً</h2>
+      <p style="color:var(--muted);line-height:1.9;max-width:640px">سواء كنت ترغب في بناء إدارة تعلم من الصفر أو تحسين البرامج الحالية، يسعدني أن أضع خبرتي في خدمتك.</p>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="cc-label">📞 الهاتف</div>
+          <strong>+966 555 376 228</strong>
+          <strong>+20 109 727 9900</strong>
+        </div>
+        <div class="contact-card">
+          <div class="cc-label">📧 البريد الإلكتروني</div>
+          <strong>islam.m.selmy@gmail.com</strong>
+          <p>بانتظار رسالتك للتعاون.</p>
+        </div>
+        <div class="contact-card">
+          <div class="cc-label">💼 LinkedIn</div>
+          <strong>linkedin.com/in/eslamselmi</strong>
+          <p>تابع أحدث الموارد والمقالات.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>© ٢٠٢٥ إسلام سلمي — التعلم رحلة لا تنتهي ✨</footer>
+
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+/* ── CANVAS PARTICLES ── */
+const canvas=document.getElementById('bgCanvas');
+const ctx=canvas.getContext('2d');
+let particles=[];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();initParticles();});
+class Particle{
+  constructor(){this.reset();}
+  reset(){
+    this.x=Math.random()*canvas.width;
+    this.y=Math.random()*canvas.height;
+    this.r=Math.random()*1.6+0.4;
+    this.sx=(Math.random()-.5)*0.3;
+    this.sy=-(Math.random()*0.4+0.1);
+    this.alpha=Math.random()*0.5+0.1;
+    const cols=['rgba(0,229,160,','rgba(124,111,255,','rgba(255,107,157,'];
+    this.col=cols[Math.floor(Math.random()*cols.length)];
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle=this.col+this.alpha+')';
+    ctx.fill();
+  }
+  update(){
+    this.x+=this.sx;this.y+=this.sy;
+    this.alpha-=0.0008;
+    if(this.alpha<=0||this.y<-10)this.reset();
+    this.draw();
+  }
+}
+function initParticles(){
+  particles=[];
+  const count=Math.floor((canvas.width*canvas.height)/12000);
+  for(let i=0;i<count;i++)particles.push(new Particle());
+}
+initParticles();
+function animCanvas(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>p.update());
+  requestAnimationFrame(animCanvas);
+}
+animCanvas();
+
+/* ── CUSTOM CURSOR ── */
+const dot=document.getElementById('cursorDot');
+const ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+(function animate(){
+  rx+=(mx-rx)*0.15;ry+=(my-ry)*0.15;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animate);
+})();
+document.querySelectorAll('a,button,.prog-head').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ring.style.width='56px';ring.style.height='56px';ring.style.borderColor='rgba(124,111,255,0.7)';});
+  el.addEventListener('mouseleave',()=>{ring.style.width='36px';ring.style.height='36px';ring.style.borderColor='rgba(0,229,160,0.5)';});
+});
+
+/* ── NAV ── */
+const navbar=document.getElementById('navbar');
+const navToggle=document.getElementById('navToggle');
+const navLinks=document.getElementById('navLinks');
+navToggle.addEventListener('click',()=>navLinks.classList.toggle('open'));
+navLinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>navLinks.classList.remove('open')));
+window.addEventListener('scroll',()=>{
+  navbar.classList.toggle('scrolled',scrollY>60);
+  document.getElementById('scrollTop').classList.toggle('show',scrollY>400);
+});
+
+/* ── SECTION HIGHLIGHT ── */
+const secs=[...document.querySelectorAll('section[id]')];
+const obsNav=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+      const a=document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+      if(a)a.classList.add('active');
+    }
+  });
+},{rootMargin:'-40% 0px -40% 0px'});
+secs.forEach(s=>obsNav.observe(s));
+
+/* ── REVEAL ON SCROLL ── */
+const obsReveal=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obsReveal.unobserve(e.target);}});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obsReveal.observe(el));
+
+/* ── SKILL BARS ── */
+const obsBar=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.bar-fill').forEach(b=>{b.style.width=b.dataset.w+'%';});
+      obsBar.unobserve(e.target);
+    }
+  });
+},{threshold:0.3});
+document.querySelectorAll('.glass-card').forEach(el=>obsBar.observe(el));
+
+/* ── COUNT UP ── */
+function countUp(el,target,suffix,duration){
+  let start=0;
+  const step=Math.ceil(target/(duration/16));
+  const t=setInterval(()=>{
+    start=Math.min(start+step,target);
+    el.textContent=start.toLocaleString('ar-EG')+suffix;
+    if(start>=target)clearInterval(t);
+  },16);
+}
+const obsCount=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      document.getElementById('countYears').textContent='٨+';
+      countUp(document.getElementById('countTrainees'),3000,'+',1500);
+      countUp(document.getElementById('countCountries'),12,'',1000);
+      obsCount.unobserve(e.target);
+    }
+  });
+},{threshold:0.3});
+obsCount.observe(document.querySelector('.glass-card'));
+document.querySelectorAll('.stat-num[data-target]').forEach(el=>{
+  const obsS=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        countUp(el,parseInt(el.dataset.target),el.dataset.suffix||'',1400);
+        obsS.unobserve(e.target);
+      }
+    });
+  },{threshold:0.5});
+  obsS.observe(el);
+});
+
+/* ── ACCORDIONS ── */
+function toggleProg(head){
+  const prog=head.parentElement;
+  const body=prog.querySelector('.prog-body');
+  const isOpen=prog.classList.contains('open');
+  document.querySelectorAll('.prog.open').forEach(p=>{
+    p.classList.remove('open');
+    p.querySelector('.prog-body').style.maxHeight='0';
+  });
+  if(!isOpen){
+    prog.classList.add('open');
+    body.style.maxHeight=body.scrollHeight+'px';
+  }
+}
+</script>
+</body>
+</html>
